@@ -21,6 +21,7 @@ GPIO_TypeDef* leds_port[] = { GPIOD, GPIOD, GPIOD, GPIOD };
 const uint16_t leds[] = { LED_V, LED_R, LED_N, LED_A };
 
 extern void APP_ISR_sw(void);
+extern void APP_ISR_1ms(void);
 
 void led_on(uint8_t led) {
 	GPIO_SetBits(leds_port[led], leds[led]);
@@ -33,7 +34,7 @@ void led_off(uint8_t led) {
 uint8_t sw_getState(void) {
 	return GPIO_ReadInputDataBit(GPIOA, BOTON);
 }
-void led_toggle(uint8_t led){
+void led_toggle(uint8_t led) {
 	GPIO_ToggleBits(leds_port[led], leds[led]);
 }
 
@@ -54,14 +55,11 @@ void EXTI0_IRQHandler(void) {
  * @brief Interrupcion llamada al pasar 1ms
  */
 void TIM2_IRQHandler(void) {
-	static uint16_t count = 0;
 
 	if (TIM_GetITStatus(TIM2, TIM_IT_Update) != RESET) {
 		TIM_ClearITPendingBit(TIM2, TIM_IT_Update);
-		if (count++ > 1000) {
-			GPIO_ToggleBits(leds_port[0], leds[0]);
-			count = 0;
-		}
+		APP_ISR_1ms();
+
 	}
 }
 
