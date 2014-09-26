@@ -23,6 +23,8 @@ const uint16_t leds[] = { LED_V, LED_R, LED_N, LED_A };
 extern void APP_ISR_sw(void);
 extern void APP_ISR_1ms(void);
 
+volatile uint16_t bsp_contMS = 0;
+
 void led_on(uint8_t led) {
 	GPIO_SetBits(leds_port[led], leds[led]);
 }
@@ -36,6 +38,12 @@ uint8_t sw_getState(void) {
 }
 void led_toggle(uint8_t led) {
 	GPIO_ToggleBits(leds_port[led], leds[led]);
+}
+
+void bsp_delayMs(uint16_t x) {
+	bsp_contMS = x;
+	while (bsp_contMS)
+		;
 }
 
 /**
@@ -59,6 +67,10 @@ void TIM2_IRQHandler(void) {
 	if (TIM_GetITStatus(TIM2, TIM_IT_Update) != RESET) {
 		TIM_ClearITPendingBit(TIM2, TIM_IT_Update);
 		APP_ISR_1ms();
+
+		if (bsp_contMS) {
+			bsp_contMS--;
+		}
 
 	}
 }
