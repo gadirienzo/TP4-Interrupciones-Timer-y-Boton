@@ -29,4 +29,5 @@ void bsp_init();
  */
 void bsp_delayMs(uint16_t x);
 
+void led_setBright(uint8_t led, uint8_t value);
 #endif
